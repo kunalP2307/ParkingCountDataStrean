@@ -1,0 +1,63 @@
+var spreadSheet = SpreadsheetApp.openByUrl("sheet_url");
+var all_data = spreadSheet.getSheetByName("P0");
+var current_data = spreadSheet.getSheetByName("CurrentP0");
+
+
+function doGet(e) {
+    var action = e.parameter.action;
+    
+
+    if(action == "get_all"){
+      return getAll(e);
+    }
+    else if(action == "get_current"){
+      return getCurrent(e);
+    }
+}  
+
+function getCurrent(e){
+    var location = e.parameter.location;
+    var record = {};
+    if(location == "xyz_mall"){
+      var row = current_data.getRange(2,1, current_data.getLastRow()-1, current_data.getLastColumn()).getValues();
+      record.date = row[0][0];
+      record.time = row[0][1];
+      record.count = row[0][2];
+      record.status = "success";
+    }
+    else{
+      record.status = "No such location present";
+    }
+    var result = JSON.stringify(record);
+    console.log(result)
+    return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getAll(e){
+    var location = e.parameter.location;
+    var records = {};
+     if(location == "xyz_mall"){
+      var rows = all_data.getRange(2,1, all_data.getLastRow()-1, all_data.getLastColumn()).getValues();
+      data = [];
+      for(var i=0; i<rows.length; i++){
+          var row = rows[i];
+          var record = {};
+          
+          record['date'] = row[0];
+          record['time'] = row[1];
+          record['count'] = row[2];
+          data.push(record);
+      }
+
+      records.items = data;
+      records.status = "success";
+      
+    }
+    else{
+      records.status = "No suck location present";
+    }
+    console.log(records);
+    var result = JSON.stringify(records);
+    return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.JSON);
+}
+
