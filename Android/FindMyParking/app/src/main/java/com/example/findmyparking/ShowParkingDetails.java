@@ -2,10 +2,12 @@ package com.example.findmyparking;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,6 +22,8 @@ public class ShowParkingDetails extends AppCompatActivity implements AsyncCallBa
     TextView textViewLoading;
     TextView textViewCountOutOff;
     ImageView imageViewRefresh;
+    Button buttonGetDataSet;
+    TextView textViewLastUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,14 @@ public class ShowParkingDetails extends AppCompatActivity implements AsyncCallBa
         textViewLoading = findViewById(R.id.text_view_loading);
         textViewCountOutOff = findViewById(R.id.text_view_count_out_off);
         imageViewRefresh = findViewById(R.id.image_view_refresh);
+        textViewLastUpdated = findViewById(R.id.text_view_last_updated);
+        buttonGetDataSet = findViewById(R.id.button_goto_down_act);
+        buttonGetDataSet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), DownloadDataSetActivity.class));
+            }
+        });
         imageViewRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,22 +84,26 @@ public class ShowParkingDetails extends AppCompatActivity implements AsyncCallBa
         view4.setVisibility(View.VISIBLE);
         textViewCountOutOff.setVisibility(View.VISIBLE);
         pieChart.setVisibility(View.VISIBLE);
+        textViewLastUpdated.setVisibility(View.VISIBLE);
         imageViewRefresh.setVisibility(View.VISIBLE);
+        buttonGetDataSet.setVisibility(View.VISIBLE);
     }
 
     private void createDataSet() {
 
     }
 
-    private void setCount(int count){
-        textViewCountOutOff.setText(count+"/"+Data.XYZ_MALL_MAX_COUNT);
+    private void setData(Data data){
+        textViewCountOutOff.setText(data.getCount()+"/"+Data.XYZ_MALL_MAX_COUNT);
+        textViewLastUpdated.setText("No change since "+data.getDate()+" "+data.getTime());
     }
+
     @Override
     public void setResult(Data result) {
         Log.d("", "setResult: "+result);
         setData(Integer.parseInt(result.getCount()));
         textViewLoading.setVisibility(View.GONE);
         makeVisible();
-        setCount(Integer.parseInt(result.getCount()));
+        setData(result);
     }
 }

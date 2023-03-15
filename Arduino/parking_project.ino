@@ -1,71 +1,84 @@
 #include <Servo.h>
 Servo i;
 byte IR_OUT_BLUE = 9;
-byte IR_OUT_ORANGE = 10;
-byte LED = 11;
-byte PERSON_COUNT = 0;
-byte ORANGE_CROSSED = 0;
-byte BLUE_CRODDED = 0;
+byte IR_IN_ORANGE = 10;
+byte VEHICLE_COUNT = 0;
+byte BUZZER = 2;
+byte SERVO = 11;
 
 void setup(){
-//pinMode(IR_OUT_BLUE,INPUT);
-//pinMode(IR_OUT_ORANGE,INPUT);
-//pinMode(LED,OUTPUT);
-// 7 segment display
-    pinMode(2, OUTPUT);
-    pinMode(3, OUTPUT);
-    pinMode(4, OUTPUT);
-    pinMode(5, OUTPUT);
-    pinMode(6, OUTPUT);
-    pinMode(7, OUTPUT);
-    pinMode(8, OUTPUT);
-    pinMode(IR_OUT_BLUE,INPUT);
-    pinMode(IR_OUT_ORANGE,INPUT);
-    pinMode(LED,OUTPUT);
-    i.attach(11);
+    pinMode(IR_OUT_BLUE, INPUT);
+    pinMode(IR_IN_ORANGE, INPUT);
+    pinMode(BUZZER, OUTPUT);
+    i.attach(SERVO);
     Serial.begin(9600);
+    init_barrier();
 }
 
 void loop(){
-    if (digitalRead(IR_OUT_ORANGE)== LOW){
+    // check for incoming vehicle
+    if (digitalRead(IR_IN_ORANGE)== LOW){
+      VEHICLE_COUNT += 1;
+      Serial.println(VEHICLE_COUNT);
+      beep_in();
       delay(1000);
-      if(PERSON_COUNT == 0){
-        digitalWrite(LED,HIGH);i.write(70);
-      }
-      PERSON_COUNT += 1;
-      Serial.println(PERSON_COUNT);
-      Num_Write(PERSON_COUNT);
+      barrier_up();
+      delay(1000);
+      barrier_down();
     }
+    
+    // check for outgoing vehicle
     if(digitalRead(IR_OUT_BLUE)== LOW){
+      VEHICLE_COUNT -= 1;
+      Serial.println(VEHICLE_COUNT); 
+      beep_out();
       delay(1000);
-      if(PERSON_COUNT == 0){
-        Serial.println(PERSON_COUNT);
-      }
-      else if(PERSON_COUNT == 1){
-        digitalWrite(LED,LOW);
-        i.write(15);
-        PERSON_COUNT -= 1;
-        Serial.println(PERSON_COUNT);
-        Num_Write(PERSON_COUNT);
-      }
-      else{
-        PERSON_COUNT -= 1;
-        Serial.println(PERSON_COUNT);
-        Num_Write(PERSON_COUNT);
-      }
+      barrier_up();
+      delay(1000);
+      barrier_down();
     }
 }
 
+//set the barrier to initial position
+void init_barrier(){
+  i.write(115);
+}
+
 void barrier_up(){
-  for(int j=120; j>=40; j--){
+  for(int j=115; j>=40; j--){
       i.write(j);
       delay(50);
   }
 }
 
 void barrier_down(){
-  for(int j=40; j<120; j++){
+  for(int j=40; j<115; j++){
     i.write(j);
     delay(50);
   }
 }
+
+void beep_in(){
+   digitalWrite(BUZZER, HIGH);
+   delay(500);
+   digitalWrite(BUZZER, LOW);
+   delay(100);
+   digitalWrite(BUZZER, HIGH);
+   delay(100);
+   digitalWrite(BUZZER, LOW);
+}
+
+void beep_out(){
+   digitalWrite(BUZZER, HIGH);
+   delay(500);
+   digitalWrite(BUZZER, LOW);
+   delay(100);
+   digitalWrite(BUZZER, HIGH);
+   delay(100);
+   digitalWrite(BUZZER, LOW);
+   delay(100);
+   digitalWrite(BUZZER, HIGH);
+   delay(100);
+   digitalWrite(BUZZER, LOW);
+}
+

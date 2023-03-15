@@ -26,21 +26,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startActivity(new Intent(getApplicationContext(), DownloadDataSetActivity.class));
 
-        File file = new File(MainActivity.this.getFilesDir(), "text");
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        try {
-            File gpxfile = new File(file, "sample.txt");
-            FileWriter writer = new FileWriter(gpxfile);
-            writer.append("Helllllllllllo");
-            writer.flush();
-            writer.close();
-      //     Toast.makeText(MainActivity.this, "Saved your text", Toast.LENGTH_LONG).show();
-        } catch (Exception e) { }
-
+        bindComponents();
     }
 
     private void bindComponents(){
